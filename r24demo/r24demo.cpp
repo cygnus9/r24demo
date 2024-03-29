@@ -4,6 +4,9 @@
 #include <gl/gl.h>
 #include <stdbool.h>
 
+#include "fbo.h"
+#include "glext-stubs.h"
+
 typedef HGLRC WINAPI wglCreateContextAttribsARB_type(HDC hdc, HGLRC hShareContext, const int* attribList);
 
 wglCreateContextAttribsARB_type* wglCreateContextAttribsARB;
@@ -236,6 +239,13 @@ WinMainCRTStartup()
     HWND window = create_window(0);
     HDC gldc = GetDC(window);
     HGLRC glrc = init_opengl(gldc);
+    init_glext_stubs();
+
+    const unsigned X = 1920;
+    const unsigned Y = 1080;
+    FBO mainfbo(X, Y);
+    FBO depthfbo(X, Y);
+    FBO hbloomfbo(512, 512);
 
     ShowWindow(window, 1);
     UpdateWindow(window);
