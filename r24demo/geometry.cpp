@@ -34,5 +34,5 @@ Program compile_program(const char *shader_program, const char *fragment_program
     glDetachShader(program, vertex);
     glDetachShader(program, fragment);
 
-    return Program{program}
+    return Program{ program };
 }

@@ -7,9 +7,8 @@ struct Program {
     GLuint handle;
 };
 
-Program compile_program(const char *shader_program, , const char *fragment_program);
+Program compile_program(const char *shader_program, const char *fragment_program);
 
 struct RenderInfo {
     Program program;
-
-}
+};

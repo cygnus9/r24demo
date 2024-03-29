@@ -148,6 +148,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="geometry.h" />
     <ClInclude Include="glext-stubs.h" />
     <ClInclude Include="glext.h" />
     <ClInclude Include="fbo.h" />
@@ -158,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fbo.cpp" />
+    <ClCompile Include="geometry.cpp" />
     <ClCompile Include="glext-stubs.cpp" />
     <ClCompile Include="r24demo.cpp" />
   </ItemGroup>
