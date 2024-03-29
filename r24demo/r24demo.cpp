@@ -36,7 +36,6 @@ static void
 fatal_error(const char* msg)
 {
     MessageBoxA(NULL, msg, "Error", MB_OK | MB_ICONEXCLAMATION);
-    exit(EXIT_FAILURE);
 }
 
 static void
@@ -231,14 +230,14 @@ create_window(HINSTANCE inst)
     return window;
 }
 
-int WINAPI
-WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd_line, int show)
+int
+WinMainCRTStartup()
 {
-    HWND window = create_window(inst);
+    HWND window = create_window(0);
     HDC gldc = GetDC(window);
     HGLRC glrc = init_opengl(gldc);
 
-    ShowWindow(window, show);
+    ShowWindow(window, 1);
     UpdateWindow(window);
 
     bool running = true;
