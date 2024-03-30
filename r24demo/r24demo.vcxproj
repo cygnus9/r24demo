@@ -163,6 +163,7 @@
     <ClInclude Include="glext.h" />
     <ClInclude Include="fbo.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="quad.h" />
     <ClInclude Include="r24demo.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="simple.h" />
