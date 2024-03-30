@@ -137,6 +137,9 @@ int calc_stride(const Geometry::attrib_defs* defs) {
 }
 
 void Geometry::configure_attribs(const GLuint program, const Geometry::attrib_defs* defs, const GLuint buffer, int divisor) {
+    if (!defs)
+        return;
+
     auto stride = calc_stride(defs);
     auto offset = 0;
     GLuint err;

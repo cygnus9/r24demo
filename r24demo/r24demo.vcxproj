@@ -189,6 +189,7 @@
     <ClInclude Include="r24demo.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="simple.h" />
+    <ClInclude Include="stepper.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="transformations.h" />
   </ItemGroup>

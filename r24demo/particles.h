@@ -32,9 +32,11 @@ public:
             void main()
             {
                 highp vec4 postex = texelFetch(positionTex, ivec2(texcoor), 0);
+                highp vec4 colortex = texelFetch(colorTex, ivec2(texcoor), 0);
+                highp float birth = colortex.w;
                 highp vec3 center = postex.xyz;
 
-                highp vec4 color = vec4(texelFetch(colorTex, ivec2(texcoor), 0).rgb, 1.0);
+                highp vec4 color = vec4(colortex.rgb, 1.0);
 
                 color = vec4(1.0, 1.0, 1.0, 1.0);
 
@@ -48,8 +50,8 @@ public:
                 gl_Position = (vec4(position, 0.0, 1.0) * scale * aspect + normalize(projectedCenter));
                 highp float brightness = 0.001/pow(scale, 2.0);
                 //brightness *= 0.001;
-                highp float sparkle = (1.0 + sin((time - postex.w) * 10.0)) / 2.0;
-                highp float fade = clamp(1.0 - ((time - postex.w) / lifetime), 0.0, 1.0);
+                highp float sparkle = (1.0 + sin((time - birth) * 10.0)) / 2.0;
+                highp float fade = clamp(1.0 - ((time - birth) / lifetime), 0.0, 1.0);
 
                 v_color =  objcolor * color * vec4(vec3(brightness * sparkle * fade), 1.0);
 

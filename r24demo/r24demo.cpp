@@ -10,6 +10,8 @@
 #include "fbo.h"
 #include "glext-stubs.h"
 #include "particles.h"
+#include "stepper.h"
+#include "quad.h"
 #include "transformations.h"
 
 typedef HGLRC WINAPI wglCreateContextAttribsARB_type(HDC hdc, HGLRC hShareContext, const int* attribList);
@@ -218,7 +220,7 @@ create_window(HINSTANCE inst)
         0,
         window_class.lpszClassName,
         "",
-        WS_POPUP | WS_VISIBLE,
+        WS_OVERLAPPEDWINDOW,
         mi.rcMonitor.left,
         mi.rcMonitor.top,
         mi.rcMonitor.right - mi.rcMonitor.left,
@@ -255,8 +257,10 @@ int main()
     FBO depthfbo(X, Y);
     FBO hbloomfbo(512, 512);
     FBO positions(tsize, tsize);
+    FBO velocities(tsize, tsize);
 
     Particles particles(tsize, positions.getTexture(), 0);
+    Stepper stepper(velocities.getTexture());
 
     {
         auto fbo = positions.select();
@@ -266,6 +270,19 @@ int main()
 
                 glWindowPos2i(x, y);
                 float pixel[4] = { cos(p * 2 * 3.14) * 5, sin(p * 2 * 3.14) * 5, 0, 0 };
+                glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
+            }
+        }
+    }
+
+    {
+        auto fbo = velocities.select();
+        for (int x = 0; x < tsize; x++) {
+            for (int y = 0; y < tsize; y++) {
+                float p = ((float)(x * tsize + y)) / (tsize * tsize);
+
+                glWindowPos2i(x, y);
+                float pixel[4] = { 0.0, -.1, 0.0, .03 };
                 glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
             }
         }
@@ -308,6 +325,12 @@ int main()
 
         SwapBuffers(gldc);
         t += 1.0 / 60.0;
+
+        {
+            // Step all the particles
+            auto fbo = positions.select();
+            stepper.render();
+        }
     }
 
     DestroyWindow(window);
