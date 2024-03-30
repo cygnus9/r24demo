@@ -332,7 +332,7 @@ int main()
             rotate(particles.m_modelview, particles.m_modelview, t * 20, 0, 1, 0);
             scale(particles.m_modelview, particles.m_modelview, 0.5, 0.5, 0.5);
             translate(particles.m_modelview, particles.m_modelview, 
-                        11 *  cos(t * 0.227 *      sin(t * 0.113)),
+                        11 * cos(t * 0.227 * sin(t * 0.113)),
                         7 * -sin(t * 0.122 * (1 + sin(t * 0.213))),
                 -35.0 + 4 *  sin(t * 0.345 * (.5 + .5 * cos(t * 0.417)))
             );

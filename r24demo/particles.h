@@ -5,6 +5,9 @@
 #include "simple.h"
 #include "transformations.h"
 
+#define MAXPARTICLES 65536
+vec2 instances[MAXPARTICLES];
+
 class Particles : public Simple {
 private:
     static const int TSIZE = 4;
@@ -90,9 +93,6 @@ public:
 		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)vertices, sizeof(vertices));
 
 		static const Geometry::attrib_defs instance_defs[] = { {"texcoor", 2}, {nullptr} };
-
-#define MAXPARTICLES 65536
-        vec2 instances[MAXPARTICLES];
 
         for (int i = 0; i < tsize; i++) {
             for (int j = 0; j < tsize; j++) {
