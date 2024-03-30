@@ -2,20 +2,16 @@
 #include <mmsystem.h>
 #include <mmreg.h>
 
-#include "4klang.h"
-
-
-float AUDIO_BUFFER[MAX_SAMPLES * 2];
 WAVEHDR waveHdr;
 
-void play_audio() {
+void play_audio(void *buffer, unsigned size) {
 	MMRESULT result;
 
 	WAVEFORMATEX wfx;
 	wfx.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
 	wfx.nChannels = 2;
-	wfx.nSamplesPerSec = SAMPLE_RATE;
-	wfx.nAvgBytesPerSec = SAMPLE_RATE * 2 * sizeof(float);
+	wfx.nSamplesPerSec = 44100;
+	wfx.nAvgBytesPerSec = 44100 * 2 * sizeof(float);
 	wfx.nBlockAlign = 2 * sizeof(float);
 	wfx.wBitsPerSample = 8 * sizeof(float);
 	wfx.cbSize = 0;
@@ -27,11 +23,9 @@ void play_audio() {
 		result = result;
 	}
 
-	_4klang_render(AUDIO_BUFFER);
-
 	memset(&waveHdr, 0, sizeof(WAVEHDR));
-	waveHdr.lpData = reinterpret_cast<char*>(AUDIO_BUFFER);
-	waveHdr.dwBufferLength = MAX_SAMPLES * 2 * sizeof(float);
+	waveHdr.lpData = reinterpret_cast<char*>(buffer);
+	waveHdr.dwBufferLength = size;
 
 	result = waveOutPrepareHeader(hWaveOut, &waveHdr, sizeof(WAVEHDR));
 	if (result != MMSYSERR_NOERROR) {

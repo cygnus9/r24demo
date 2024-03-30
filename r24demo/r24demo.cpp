@@ -4,9 +4,11 @@
 #include <gl/gl.h>
 #include <stdbool.h>
 
+#include "4klang.h"
 #include "audio.h"
 #include "fbo.h"
 #include "glext-stubs.h"
+
 
 typedef HGLRC WINAPI wglCreateContextAttribsARB_type(HDC hdc, HGLRC hShareContext, const int* attribList);
 
@@ -234,12 +236,17 @@ create_window(HINSTANCE inst)
     return window;
 }
 
+
+float AUDIO_BUFFER[MAX_SAMPLES * 2];
+
 int main()
 {
     HWND window = create_window(0);
     HDC gldc = GetDC(window);
     HGLRC glrc = init_opengl(gldc);
     init_glext_stubs();
+
+    _4klang_render(AUDIO_BUFFER);
 
     const unsigned X = 1920;
     const unsigned Y = 1080;
@@ -250,7 +257,7 @@ int main()
     ShowWindow(window, 1);
     UpdateWindow(window);
 
-    play_audio();
+    play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
 
     bool running = true;
     while (running) {
