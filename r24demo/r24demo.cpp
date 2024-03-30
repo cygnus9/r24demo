@@ -210,24 +210,19 @@ create_window(HINSTANCE inst)
         return 0;
     }
 
-    // Specify a desired width and height, then adjust the rect so the window's client area will be
-    // that size.
-    RECT rect = {
-        .right = 1024,
-        .bottom = 576,
-    };
-    DWORD window_style = WS_OVERLAPPEDWINDOW;
-    AdjustWindowRect(&rect, window_style, false);
+    HMONITOR hmon = MonitorFromPoint(POINT{0, 0}, MONITOR_DEFAULTTOPRIMARY);
+    MONITORINFO mi = { sizeof(mi) };
+    GetMonitorInfo(hmon, &mi);
 
     HWND window = CreateWindowExA(
         0,
         window_class.lpszClassName,
         "",
-        window_style,
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
-        rect.right - rect.left,
-        rect.bottom - rect.top,
+        WS_POPUP | WS_VISIBLE,
+        mi.rcMonitor.left,
+        mi.rcMonitor.top,
+        mi.rcMonitor.right - mi.rcMonitor.left,
+        mi.rcMonitor.bottom - mi.rcMonitor.top,
         0,
         0,
         inst,
@@ -279,9 +274,9 @@ int main()
     ShowWindow(window, 1);
     UpdateWindow(window);
 
-    // play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
     float t = 0.0;
 
+    auto playback = play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
     bool running = true;
     while (running) {
         MSG msg;
@@ -308,11 +303,13 @@ int main()
 
             particles.render();
         }
+        playback.get_progress();
 
         SwapBuffers(gldc);
         t += 1.0 / 60.0;
     }
 
+    DestroyWindow(window);
     return 0;
 }
 
