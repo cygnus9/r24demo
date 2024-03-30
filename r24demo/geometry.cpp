@@ -94,9 +94,37 @@ GLuint Geometry::create_vertex_buffer(void* p, size_t size) {
     return buffer;
 }
 
-void Geometry::uniform_matrix(GLuint program, const char* name, const matrix4f& m) {
+void Geometry::uniform(GLuint program, const char* name, const matrix4f& m) {
     GLuint loc = glGetUniformLocation(program, name);
     glUniformMatrix4fv(loc, 1, false, &m.m[0].x);
+}
+
+void Geometry::uniform(GLuint program, const char* name, const vec3& m) {
+    GLuint loc = glGetUniformLocation(program, name);
+    glUniform3fv(loc, 1, (GLfloat *) &m);
+}
+
+void Geometry::uniform(GLuint program, const char* name, const vec4& m) {
+    GLuint loc = glGetUniformLocation(program, name);
+    glUniform4fv(loc, 1, (GLfloat*)&m);
+}
+
+void Geometry::uniform(GLuint program, const char* name, const GLuint& m) {
+    GLuint loc = glGetUniformLocation(program, name);
+    glUniform1i(loc, m);
+}
+
+void Geometry::texture(GLuint program, const char* name, GLuint texunit, const GLuint& tex) {
+    GLuint loc = glGetUniformLocation(program, name);
+    glUniform1i(loc, texunit);
+    glActiveTexture(GL_TEXTURE0 + texunit);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glBindSampler(texunit, 0);
+}
+
+void Geometry::uniform(GLuint program, const char* name, const float& m) {
+    GLuint loc = glGetUniformLocation(program, name);
+    glUniform1fv(loc, 1, &m);
 }
 
 int calc_stride(const Geometry::attrib_defs* defs) {
