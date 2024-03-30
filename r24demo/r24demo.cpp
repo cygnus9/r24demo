@@ -8,6 +8,7 @@
 #include "audio.h"
 #include "fbo.h"
 #include "glext-stubs.h"
+#include "transformations.h"
 
 
 typedef HGLRC WINAPI wglCreateContextAttribsARB_type(HDC hdc, HGLRC hShareContext, const int* attribList);
