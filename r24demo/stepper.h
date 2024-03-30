@@ -31,8 +31,11 @@ public:
 			}		)sl";
 
 	Stepper(GLuint tex) : Simple(), m_tex(tex) {
-		static const Geometry::attrib_defs vertex_defs[] = { {"position", 2}, {nullptr} };
-		static const vec2 vertices[] = { {-1, -1}, {-1, 1}, {1, 1}, {1, -1} };
+		static const Geometry::attrib_defs vertex_defs[] = { {"position", 2}, {"texcoor", 2 }, { nullptr } };
+		static const struct {
+			vec2 pos;
+			vec2 texcoor;
+		} vertices[] = { { {-1, -1}, { 0, 0 } }, { { -1, 1 }, { 1, 0 } }, { {1, 1}, { 1, 1 } }, { {1, -1}, { 0, 1 } } };
 
 		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)vertices, sizeof(vertices));
 

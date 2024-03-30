@@ -293,7 +293,7 @@ int main()
 
     {
         auto fbo = velocities.select();
-        for (int x = 0; x < tsize; x++) {
+        for (int x = 1; x < tsize; x++) {
             for (int y = 0; y < tsize; y++) {
                 float p = ((float)(x * tsize + y)) / (tsize * tsize);
 

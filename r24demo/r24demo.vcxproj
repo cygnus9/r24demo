@@ -178,6 +178,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="4klang.h" />
+    <ClInclude Include="accelerator.h" />
     <ClInclude Include="audio.h" />
     <ClInclude Include="geometry.h" />
     <ClInclude Include="glext-stubs.h" />
