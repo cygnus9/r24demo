@@ -96,8 +96,8 @@ public:
 
         for (int i = 0; i < tsize; i++) {
             for (int j = 0; j < tsize; j++) {
-                instances[i * tsize + j].x = i;
-                instances[i * tsize + j].y = j;
+                instances[i * tsize + j].x = float(i);
+                instances[i * tsize + j].y = float(j);
             }
         }
 

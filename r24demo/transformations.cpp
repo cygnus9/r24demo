@@ -11,7 +11,7 @@ namespace {
         if (&mtx_a == &mtx_out) {
             matrix4f mtx_temp;
             dot_product(mtx_a, mtx_b, mtx_temp);
-             memcpy(&mtx_out, &mtx_temp, sizeof(mtx_temp));
+            memcpy(&mtx_out, &mtx_temp, sizeof(mtx_temp));
         } else {
             assert(&mtx_b != &mtx_out);
             for (int x = 0; x < 4; x++) {

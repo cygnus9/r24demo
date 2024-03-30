@@ -299,7 +299,6 @@ int main()
     Stepper stepper;
     Accelerator accelerator(positions.getTexture());
 
-
     ShowWindow(window, 1);
     UpdateWindow(window);
 
@@ -324,16 +323,20 @@ int main()
 
         const auto t = playback.get_progress();
         {
-            matrix4f i, j;
-            identity(i);
-            rotate(i, j, 0, 0, 1, 0);
-            scale(j, i, 0.5, 0.5, 0.5);
-            translate(i, particles.m_modelview, 0, 0, -30.0);
+
+            identity(particles.m_modelview);
+            rotate(particles.m_modelview, particles.m_modelview, t * 20, 0, 1, 0);
+            scale(particles.m_modelview, particles.m_modelview, 0.5, 0.5, 0.5);
+            translate(particles.m_modelview, particles.m_modelview, 
+                        11 *  cos(t * 0.227 *      sin(t * 0.113)),
+                        7 * -sin(t * 0.122 * (1 + sin(t * 0.213))),
+                -35.0 + 4 *  sin(t * 0.345 * (.5 + .5 * cos(t * 0.417)))
+            );
+
             frustum(particles.m_projection, -1, 1, -1, 1, 1.0, 10000.0);
 
             particles.render();
         }
-        playback.get_progress();
 
         SwapBuffers(gldc);
 
