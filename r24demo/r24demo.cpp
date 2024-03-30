@@ -7,6 +7,7 @@
 #include "audio.h"
 #include "fbo.h"
 #include "glext-stubs.h"
+#include "simple.h"
 
 typedef HGLRC WINAPI wglCreateContextAttribsARB_type(HDC hdc, HGLRC hShareContext, const int* attribList);
 
@@ -36,11 +37,6 @@ wglChoosePixelFormatARB_type* wglChoosePixelFormatARB;
 #define WGL_FULL_ACCELERATION_ARB                 0x2027
 #define WGL_TYPE_RGBA_ARB                         0x202B
 
-static void
-fatal_error(const char* msg)
-{
-    MessageBoxA(NULL, msg, "Error", MB_OK | MB_ICONEXCLAMATION);
-}
 
 static void
 init_opengl_extensions(void)
@@ -58,7 +54,7 @@ init_opengl_extensions(void)
     };
 
     if (!RegisterClassA(&window_class)) {
-        fatal_error("Failed to register dummy OpenGL window.");
+        return;
     }
 
     HWND dummy_window = CreateWindowExA(
@@ -76,7 +72,7 @@ init_opengl_extensions(void)
         0);
 
     if (!dummy_window) {
-        fatal_error("Failed to create dummy OpenGL window.");
+        return;
     }
 
     HDC dummy_dc = GetDC(dummy_window);
@@ -95,19 +91,19 @@ init_opengl_extensions(void)
 
     int pixel_format = ChoosePixelFormat(dummy_dc, &pfd);
     if (!pixel_format) {
-        fatal_error("Failed to find a suitable pixel format.");
+        return;
     }
     if (!SetPixelFormat(dummy_dc, pixel_format, &pfd)) {
-        fatal_error("Failed to set the pixel format.");
+        return;
     }
 
     HGLRC dummy_context = wglCreateContext(dummy_dc);
     if (!dummy_context) {
-        fatal_error("Failed to create a dummy OpenGL rendering context.");
+        return;
     }
 
     if (!wglMakeCurrent(dummy_dc, dummy_context)) {
-        fatal_error("Failed to activate dummy OpenGL rendering context.");
+        return;
     }
 
     wglCreateContextAttribsARB = (wglCreateContextAttribsARB_type*)wglGetProcAddress("wglCreateContextAttribsARB");
@@ -141,30 +137,30 @@ init_opengl(HDC real_dc)
     UINT num_formats;
     wglChoosePixelFormatARB(real_dc, pixel_format_attribs, 0, 1, &pixel_format, &num_formats);
     if (!num_formats) {
-        fatal_error("Failed to set the OpenGL 3.3 pixel format.");
+        return 0;
     }
 
     PIXELFORMATDESCRIPTOR pfd;
     DescribePixelFormat(real_dc, pixel_format, sizeof(pfd), &pfd);
     if (!SetPixelFormat(real_dc, pixel_format, &pfd)) {
-        fatal_error("Failed to set the OpenGL 3.3 pixel format.");
+        return 0;
     }
 
     // Specify that we want to create an OpenGL 3.3 core profile context
     int gl33_attribs[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_PROFILE_MASK_ARB,  WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        WGL_CONTEXT_PROFILE_MASK_ARB, /*WGL_CONTEXT_CORE_PROFILE_BIT_ARB*/0,
         0,
     };
 
     HGLRC gl33_context = wglCreateContextAttribsARB(real_dc, 0, gl33_attribs);
     if (!gl33_context) {
-        fatal_error("Failed to create OpenGL 3.3 context.");
+        return 0;
     }
 
     if (!wglMakeCurrent(real_dc, gl33_context)) {
-        fatal_error("Failed to activate OpenGL 3.3 rendering context.");
+        return 0;
     }
 
     return gl33_context;
@@ -197,11 +193,11 @@ create_window(HINSTANCE inst)
         .hInstance = inst,
         .hCursor = LoadCursor(0, IDC_ARROW),
         .hbrBackground = 0,
-        .lpszClassName = "WGL_fdjhsklf",
+        .lpszClassName = "WND",
     };
 
     if (!RegisterClassA(&window_class)) {
-        fatal_error("Failed to register window.");
+        return 0;
     }
 
     // Specify a desired width and height, then adjust the rect so the window's client area will be
@@ -216,7 +212,7 @@ create_window(HINSTANCE inst)
     HWND window = CreateWindowExA(
         0,
         window_class.lpszClassName,
-        "OpenGL",
+        "",
         window_style,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
@@ -228,7 +224,7 @@ create_window(HINSTANCE inst)
         0);
 
     if (!window) {
-        fatal_error("Failed to create window.");
+        return 0;
     }
 
     return window;
@@ -243,9 +239,12 @@ int main()
 
     const unsigned X = 1920;
     const unsigned Y = 1080;
+
     FBO mainfbo(X, Y);
     FBO depthfbo(X, Y);
     FBO hbloomfbo(512, 512);
+
+    Quad quad;
 
     ShowWindow(window, 1);
     UpdateWindow(window);
@@ -268,7 +267,7 @@ int main()
         glClearColor(1.0f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Do OpenGL rendering here
+        quad.render();
 
         SwapBuffers(gldc);
     }

@@ -6,6 +6,7 @@
 class FBO;
 
 class FBOGuard {
+public:
     ~FBOGuard();
 
 private:
