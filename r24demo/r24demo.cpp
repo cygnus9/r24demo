@@ -4,6 +4,7 @@
 #include <gl/gl.h>
 #include <stdbool.h>
 
+#include "audio.h"
 #include "fbo.h"
 #include "glext-stubs.h"
 
@@ -233,8 +234,7 @@ create_window(HINSTANCE inst)
     return window;
 }
 
-int
-WinMainCRTStartup()
+int main()
 {
     HWND window = create_window(0);
     HDC gldc = GetDC(window);
@@ -249,6 +249,8 @@ WinMainCRTStartup()
 
     ShowWindow(window, 1);
     UpdateWindow(window);
+
+    play_audio();
 
     bool running = true;
     while (running) {
@@ -273,3 +275,13 @@ WinMainCRTStartup()
 
     return 0;
 }
+
+#ifdef NDEBUG
+int WinMainCRTStartup() {
+    return main();
+}
+#else
+int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+    return main();
+}
+#endif
