@@ -256,14 +256,14 @@ void addParticle(FBO& positions, FBO& colors, FBO& velocities, int tsize, vec3 p
     {
         auto fbo = colors.select();
         glWindowPos2i(x, y);
-        float pixel[4] = { color.x, color.y, color.z, 0 };
+        float pixel[4] = { color.x, color.y, color.z, t };
         glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
     }
 
     {
         auto fbo = velocities.select();
         glWindowPos2i(x, y);
-        float pixel[4] = { velocity.x, velocity.y, velocity.z, t };
+        float pixel[4] = { velocity.x, velocity.y, velocity.z, 0 };
         // float pixel[4] = { 0,0, 0, 0 };
         glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
     }
@@ -282,7 +282,7 @@ int main()
 
     const unsigned X = 1920;
     const unsigned Y = 1080;
-    const int tsize = 32;
+    const int tsize = 128;
 
     FBO mainfbo(X, Y);
     FBO depthfbo(X, Y);
@@ -335,6 +335,7 @@ int main()
 
             frustum(particles.m_projection, -1, 1, -1, 1, 1.0, 10000.0);
 
+            particles.setTime(t);
             particles.render();
         }
 
@@ -361,11 +362,19 @@ int main()
         }
 
         float dt = 1.0 / 60.0;
-        vec3 pos = { sin(t * 7) * 20, cos(t * 9) * 14, sin(t * 3) * 8 };
+        vec3 pos = { sin(t * 2) * 20, cos(t * 5) * 14, sin(t * 3) * 8 };
         vec3 velocity = { (pos.x - lastpos.x) / dt , (pos.y - lastpos.y) / dt , (pos.z - lastpos.z) / dt };
         lastpos = pos;
-        vec3 color = { 0.8, 0.6, 0.1 };
-        addParticle(positions, colors, velocities, tsize, pos, velocity, color, t);
+        vec3 color = { 0.04, 0.03, 0.005 };
+
+        for (int i = 0; i < 10; i++) {
+            float rnd = fmod(t * 1000, 1);
+            float rnd2 = fmod(t * 997, 1);
+            float rnd3 = fmod(t * 993, 1);
+            vec3 newpos = { pos.x + rnd, pos.y + rnd2, pos.z + rnd3 };
+            vec3 newvelocity = { velocity.x + rnd2, velocity.y + rnd3, velocity.z + rnd };
+            addParticle(positions, colors, velocities, tsize, newpos, newvelocity, color, t + rnd);
+        }
     }
 
     DestroyWindow(window);

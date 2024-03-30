@@ -42,11 +42,11 @@ public:
                 highp vec4 worldCenter = modelview * vec4(center, 1.0);
                 highp vec4 worldAutofocus = vec4(autoFocus, 1.0);
 
-                highp float scale = abs((worldCenter.z - worldAutofocus.z) * 0.01);
-                scale = clamp(scale, 0.005, 0.08);
+                highp float scale = abs((worldCenter.z - worldAutofocus.z) * 0.002);
+                scale = clamp(scale, 0.005, 0.2);
 
                 gl_Position = (vec4(position, 0.0, 1.0) * scale * aspect + normalize(projectedCenter));
-                highp float brightness = 0.001/pow(scale, 2.0);
+                highp float brightness = 0.0001/pow(scale, 2.0);
                 //brightness *= 0.001;
                 highp float sparkle = (1.0 + sin((time - birth) * 10.0)) / 2.0;
                 highp float fade = clamp(1.0 - ((time - birth) / lifetime), 0.0, 1.0);
@@ -107,13 +107,17 @@ public:
 			instance_buffer, tsize * tsize, instance_defs);
 	}
 
+    void setTime(float t) {
+        m_t = t;
+    }
+
     void uniforms(GLuint program) {
         Geometry::uniform(program, "modelview", m_modelview);
         Geometry::uniform(program, "projection", m_projection);
         Geometry::uniform(program, "aspect", m_aspect);
 
         Geometry::uniform(program, "objcolor", m_objcolor);
-        Geometry::uniform(program, "time", (float)0.0);
+        Geometry::uniform(program, "time", m_t);
         Geometry::uniform(program, "lifetime", (float)10.0);
         Geometry::uniform(program, "autoFocus", m_autoFocus);
 
@@ -132,6 +136,6 @@ public:
     GLuint m_positionTex;
     GLuint m_colorTex;
 
-
+    float m_t;
 };
 
