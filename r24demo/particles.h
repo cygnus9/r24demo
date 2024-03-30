@@ -42,11 +42,11 @@ public:
                 highp vec4 worldCenter = modelview * vec4(center, 1.0);
                 highp vec4 worldAutofocus = vec4(autoFocus, 1.0);
 
-                highp float scale = abs((worldCenter.z - worldAutofocus.z) * 0.002);
-                scale = clamp(scale, 0.005, 0.2);
+                highp float scale = abs((worldCenter.z - worldAutofocus.z) * 0.001);
+                scale = clamp(scale, 0.003, 0.8);
 
                 gl_Position = (vec4(position, 0.0, 1.0) * scale * aspect + normalize(projectedCenter));
-                highp float brightness = 0.0001/pow(scale, 2.0);
+                highp float brightness = 0.0005/pow(scale, 2.0);
                 //brightness *= 0.001;
                 highp float sparkle = (1.0 + sin((time - birth) * 10.0)) / 2.0;
                 highp float fade = clamp(1.0 - ((time - birth) / lifetime), 0.0, 1.0);

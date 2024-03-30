@@ -305,6 +305,7 @@ int main()
     auto playback = play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
     bool running = true;
     vec3 lastpos = { 0, 0, 0 };
+    float last_t = 0;
     while (running) {
         MSG msg;
         while (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE)) {
@@ -322,6 +323,9 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         const auto t = playback.get_progress();
+        const auto dt = t - last_t;
+        last_t = t;
+
         {
 
             identity(particles.m_modelview);
@@ -345,7 +349,7 @@ int main()
             // Step all the particles
             auto fbo = positions.select();
             stepper.setVelocityTex(currentVelocities->getTexture());
-            stepper.setColor(vec4{ 1,1,1,0.5 / 60.0 });
+            stepper.setColor(vec4{ 1,1,1, dt / 2.0f });
             stepper.render();
         }
 
@@ -353,6 +357,7 @@ int main()
             // Step all the accelerations
             auto fbo = otherVelocities->select();
             accelerator.setVelocityTex(currentVelocities->getTexture());
+            accelerator.setDT(dt);
             accelerator.render();
 
             // Swap the velocity FBOs
@@ -361,19 +366,20 @@ int main()
             currentVelocities = tmp;
         }
 
-        float dt = 1.0 / 60.0;
-        vec3 pos = { sin(t * 2) * 20, cos(t * 5) * 14, sin(t * 3) * 8 };
+        vec3 pos = { sin(t * 7) * 20, cos(t * 5) * 14, sin(t * 9) * 8 };
         vec3 velocity = { (pos.x - lastpos.x) / dt , (pos.y - lastpos.y) / dt , (pos.z - lastpos.z) / dt };
         lastpos = pos;
-        vec3 color = { 0.04, 0.03, 0.005 };
+        vec3 color1 = { 0.04, 0.03, 0.005 };
+        vec3 color2 = { 0.04, 0.035, 0.04 };
 
-        for (int i = 0; i < 10; i++) {
-            float rnd = fmod(t * 1000, 1);
-            float rnd2 = fmod(t * 997, 1);
-            float rnd3 = fmod(t * 993, 1);
+        for (int i = 0; i < 2000 * dt; i++) {
+            float rnd = fmod(t * 1000, 1) * 5;
+            float rnd2 = fmod(t * 997, 1) * 5;
+            float rnd3 = fmod(t * 993, 1) * 5;
             vec3 newpos = { pos.x + rnd, pos.y + rnd2, pos.z + rnd3 };
             vec3 newvelocity = { velocity.x + rnd2, velocity.y + rnd3, velocity.z + rnd };
-            addParticle(positions, colors, velocities, tsize, newpos, newvelocity, color, t + rnd);
+            vec3* color = i % 2 ? &color1 : &color2;
+            addParticle(positions, colors, velocities, tsize, newpos, newvelocity, *color, t + rnd);
         }
     }
 

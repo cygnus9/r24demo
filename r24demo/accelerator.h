@@ -35,7 +35,7 @@ public:
                 highp vec3 currentSpeed = textureLod(velocityTex, v_texcoor, 0.0).xyz;
                 highp vec3 currentPos = textureLod(positionTex, v_texcoor, 0.0).xyz;
                 highp vec3 dist = currentPos - singularity;
-                f_color = vec4(currentSpeed * (1.0 - (drag * dt * length(currentSpeed))) - normalize(dist) * pow(length(dist), -2.0) * dt * gravity, 1.0);
+                f_color = vec4(currentSpeed * (1.0 - (drag * dt * length(currentSpeed))) - normalize(dist) * pow(length(dist), -2.0) * dt * gravity + vec3(0, -10, 0) * dt, 1.0);
             }
 		)sl";
 
@@ -52,7 +52,6 @@ public:
 			0, 1, nullptr);
 
 		m_objcolor = vec4{ 1.0, 1.0, 1.0, 1.0 };
-		m_dt = 1.0/60.0;
 		m_gravity = 50;
 		m_drag = 0.01;
 		m_singularity = vec3{ 0.0, 0.0, 0.0 };
@@ -63,6 +62,10 @@ public:
 
 	void setVelocityTex(GLuint tex) {
 		m_velocityTex = tex;
+	}
+
+	void setDT(float dt) {
+		m_dt = dt;
 	}
 
 	void uniforms(GLuint program) {
