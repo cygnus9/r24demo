@@ -291,8 +291,6 @@ int main()
     ShowWindow(window, 1);
     UpdateWindow(window);
 
-    float t = 0.0;
-
     auto playback = play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
     bool running = true;
     while (running) {
@@ -311,10 +309,11 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        const auto t = playback.get_progress();
         {
             matrix4f i, j;
             identity((float(*)[4]) & i);
-            rotate((float(*)[4]) & i, (float(*)[4]) & j, t / 0.2, 0, 1, 0);
+            rotate((float(*)[4]) & i, (float(*)[4]) & j, t * 20, 0, 1, 0);
             scale((float(*)[4]) & j, (float(*)[4]) & i, 0.5, 0.5, 0.5);
             translate((float(*)[4]) & i, (float(*)[4]) & particles.m_modelview, 0, 0, -10.0);
             frustum((float(*)[4]) & particles.m_projection, -1, 1, -1, 1, 1.0, 10000.0);
@@ -324,7 +323,6 @@ int main()
         playback.get_progress();
 
         SwapBuffers(gldc);
-        t += 1.0 / 60.0;
 
         {
             // Step all the particles
