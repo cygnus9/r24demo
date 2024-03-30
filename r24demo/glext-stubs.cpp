@@ -26,6 +26,14 @@ PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+PFNGLUNIFORM3FVPROC glUniform3fv;
+PFNGLUNIFORM4FVPROC glUniform4fv;
+PFNGLUNIFORM1FVPROC glUniform1fv;
+PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLACTIVETEXTUREPROC glActiveTexture;
+PFNGLBINDSAMPLERPROC glBindSampler;
+PFNGLWINDOWPOS2IPROC glWindowPos2i;
+
 
 void init_glext_stubs() {
     glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
@@ -55,6 +63,13 @@ void init_glext_stubs() {
     glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORARBPROC)wglGetProcAddress("glVertexAttribDivisor");
     glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays");
     glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray");
+    glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv");
+    glUniform4fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform4fv");
+    glUniform1fv = (PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv");
+    glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
+    glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture");
+    glBindSampler = (PFNGLBINDSAMPLERPROC)wglGetProcAddress("glBindSampler");
+    glWindowPos2i = (PFNGLWINDOWPOS2IPROC)wglGetProcAddress("glWindowPos2i");
 
     // DEBUG ONLY
     glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");

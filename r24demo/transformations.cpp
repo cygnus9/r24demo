@@ -23,10 +23,7 @@ namespace {
     }
 }
 
-void translate(const float mtx_in[4][4], float mtx_out[4][4], const float x, const float *py, const float *pz) {
-    const float y = py ? *py : x;
-    const float z = pz ? *pz : x;
-
+void translate(const float mtx_in[4][4], float mtx_out[4][4], const float x, const float y, const float z) {
     const float mtx_transform[4][4] = {
         { 1, 0, 0, 0 },
         { 0, 1, 0, 0 },
@@ -36,10 +33,7 @@ void translate(const float mtx_in[4][4], float mtx_out[4][4], const float x, con
     dot_product(mtx_in, mtx_transform, mtx_out);
 }
 
-void scale(const float mtx_in[4][4], float mtx_out[4][4], const float x, const float *py, const float *pz) {
-    const float y = py ? *py : x;
-    const float z = pz ? *pz : x;
-
+void scale(const float mtx_in[4][4], float mtx_out[4][4], const float x, const float y, const float z) {
     const float mtx_transform[4][4] = {
         { x, 0, 0, 0 },
         { 0, y, 0, 0 },
@@ -129,4 +123,18 @@ void frustum(float mtx_out[4][4], float left, float right, float bottom, float t
     mtx_out[2][2] = -(zfar + znear) / (zfar - znear);
     mtx_out[3][2] = -2.0f * znear * zfar / (zfar - znear);
     mtx_out[2][3] = -1.0f;
+}
+
+void identity(float mtx_out[4][4])
+{
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            mtx_out[i][j] = 0;
+        }
+    }
+
+    mtx_out[0][0] = 1.0;
+    mtx_out[1][1] = 1.0;
+    mtx_out[2][2] = 1.0;
+    mtx_out[3][3] = 1.0;
 }

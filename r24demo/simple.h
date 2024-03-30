@@ -23,7 +23,7 @@ public:
 
 		Geometry::use_program(m_program);
 		err = glGetError();
-		glBlendFunc(GL_ONE, GL_ONE);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		err = glGetError();
 		Geometry::use_vao(m_vao);
 		err = glGetError();
@@ -31,11 +31,14 @@ public:
 		err = glGetError();
 		Geometry::configure_attribs(m_program, m_instance_defs, m_instance_buffer, 1);
 		err = glGetError();
+		uniforms(m_program);
 		Geometry::render(GL_QUADS, m_vertex_count, m_instance_count);
 		err = glGetError();
 		Geometry::use_program(0);
 		err = glGetError();
 	}
+
+	virtual void uniforms(GLuint program) { }
 
 private:
 	const char* m_vertex_code;

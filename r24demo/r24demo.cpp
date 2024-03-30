@@ -3,12 +3,13 @@
 #include <windows.h>
 #include <gl/gl.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "4klang.h"
 #include "audio.h"
 #include "fbo.h"
 #include "glext-stubs.h"
-#include "quad.h"
+#include "particles.h"
 #include "transformations.h"
 
 typedef HGLRC WINAPI wglCreateContextAttribsARB_type(HDC hdc, HGLRC hShareContext, const int* attribList);
@@ -248,15 +249,32 @@ int main()
 
     const unsigned X = 1920;
     const unsigned Y = 1080;
+    const int tsize = 4;
 
     FBO mainfbo(X, Y);
     FBO depthfbo(X, Y);
     FBO hbloomfbo(512, 512);
+    FBO positions(tsize, tsize);
 
-    Quad quad;
+    Particles particles(tsize, positions.getTexture(), 0);
+
+    {
+        auto fbo = positions.select();
+        for (int x = 0; x < tsize; x++) {
+            for (int y = 0; y < tsize; y++) {
+                float p = ((float)(x * tsize + y)) / (tsize * tsize);
+
+                glWindowPos2i(x, y);
+                float pixel[4] = { cos(p * 2 * 3.14) * 5, sin(p * 2 * 3.14) * 5, 0, 0 };
+                glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
+            }
+        }
+    }
 
     ShowWindow(window, 1);
     UpdateWindow(window);
+
+    float t = 0.0;
 
     auto playback = play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
     bool running = true;
@@ -272,13 +290,23 @@ int main()
             }
         }
 
-        glClearColor(1.0f, 0.5f, 0.5f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        {
+            matrix4f i, j;
+            identity((float(*)[4]) & i);
+            rotate((float(*)[4]) & i, (float(*)[4]) & j, t / 0.2, 0, 1, 0);
+            scale((float(*)[4]) & j, (float(*)[4]) & i, 0.5, 0.5, 0.5);
+            translate((float(*)[4]) & i, (float(*)[4]) & particles.m_modelview, 0, 0, -10.0);
+            frustum((float(*)[4]) & particles.m_projection, -1, 1, -1, 1, 1.0, 10000.0);
+
+            particles.render();
+        }
         playback.get_progress();
-        quad.render();
 
         SwapBuffers(gldc);
+        t += 1.0 / 60.0;
     }
 
     DestroyWindow(window);
