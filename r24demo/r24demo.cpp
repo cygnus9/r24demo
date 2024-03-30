@@ -274,8 +274,6 @@ int main()
     ShowWindow(window, 1);
     UpdateWindow(window);
 
-    float t = 0.0;
-
     auto playback = play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
     bool running = true;
     while (running) {
@@ -294,6 +292,7 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        const auto t = playback.get_progress();
         {
             matrix4f i, j;
             identity((float(*)[4]) & i);
@@ -307,7 +306,6 @@ int main()
         playback.get_progress();
 
         SwapBuffers(gldc);
-        t += 1.0 / 60.0;
     }
 
     DestroyWindow(window);
