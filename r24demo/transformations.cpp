@@ -1,14 +1,22 @@
 #include <cassert>
+#include <cstring>
 #include <cmath>
 #include <numbers>
 
 namespace {
     void dot_product(const float mtx_a[4][4], const float mtx_b[4][4], float mtx_out[4][4]) {
-        for (int x = 0; x < 4; x++) {
-            for (int y = 0; y < 4; y++) {
-                mtx_out[x][y] = 0;
-                for (int n = 0; n < 4; ++n) {
-                    mtx_out[x][y] += mtx_a[x][n] * mtx_b[n][y];
+        if (mtx_a == mtx_out) {
+            float mtx_temp[4][4];
+            dot_product(mtx_a, mtx_b, mtx_temp);
+            memcpy(mtx_out, mtx_temp, sizeof(mtx_temp));
+        } else {
+            assert(mtx_b != mtx_out);
+            for (int x = 0; x < 4; x++) {
+                for (int y = 0; y < 4; y++) {
+                    mtx_out[x][y] = 0;
+                    for (int n = 0; n < 4; ++n) {
+                        mtx_out[x][y] += mtx_a[x][n] * mtx_b[n][y];
+                    }
                 }
             }
         }
