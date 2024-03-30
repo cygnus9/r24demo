@@ -7,13 +7,13 @@
 %define MAX_INSTRUMENTS	4
 %define MAX_VOICES 1
 %define HLD 1
-%define BPM 125.000000
-%define MAX_PATTERNS 4
+%define BPM 120.000000
+%define MAX_PATTERNS 14
 %define PATTERN_SIZE_SHIFT 4
 %define PATTERN_SIZE (1 << PATTERN_SIZE_SHIFT)
 %define	MAX_TICKS (MAX_PATTERNS*PATTERN_SIZE)
-%define	SAMPLES_PER_TICK 5292
-%define DEF_LFO_NORMALIZE 0.0000472411
+%define	SAMPLES_PER_TICK 5512
+%define DEF_LFO_NORMALIZE 0.0000453515
 %define	MAX_SAMPLES	(SAMPLES_PER_TICK*MAX_TICKS)
 ;%define 	GO4K_USE_16BIT_OUTPUT
 ;%define 	GO4K_USE_GROOVE_PATTERN
@@ -448,21 +448,13 @@ section .data align=1
 %endif
 go4k_patterns
 	db	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	db	48, 0, 0, 0, 48, 0, 0, 0, 0, 48, 0, 0, 0, 48, 0, 0, 
-	db	0, 48, HLD, 0, 0, 0, 48, 0, 0, 0, 48, HLD, HLD, HLD, 48, HLD, 
-	db	0, 0, 0, 48, 0, 0, 0, 48, 0, 0, 0, 0, 48, 0, 0, 0, 
-	db	0, 0, 96, 0, 0, 0, 0, 96, 0, 0, 0, 96, 0, 0, 0, 96, 
-	db	0, 0, 0, 0, 96, 0, 0, 0, 96, 0, 0, 0, 96, 0, 0, 0, 
-	db	0, 96, 0, 0, 0, 96, 0, 0, 0, 96, 0, 0, 0, 0, 96, 0, 
-	db	0, 0, 96, 0, 0, 0, 96, HLD, 0, 0, 0, 96, 0, 0, 0, 96, 
-	db	0, 0, 0, 0, 96, HLD, HLD, HLD, HLD, HLD, HLD, HLD, HLD, 96, HLD, HLD, 
-	db	HLD, HLD, HLD, HLD, HLD, HLD, 96, HLD, HLD, HLD, HLD, HLD, HLD, HLD, 96, HLD, 
-	db	HLD, HLD, HLD, HLD, HLD, HLD, HLD, 96, HLD, HLD, HLD, HLD, HLD, HLD, HLD, HLD, 
-	db	96, HLD, HLD, HLD, HLD, HLD, HLD, HLD, HLD, 96, HLD, HLD, HLD, HLD, HLD, HLD, 
-	db	0, 0, 48, 0, 0, 0, 0, 48, 0, 0, 0, 48, 0, 0, 0, 48, 
-	db	0, 0, 0, 0, 50, 0, 0, 0, 50, 0, 0, 0, 50, 0, 0, 0, 
-	db	0, 50, 0, 0, 0, 43, 0, 0, 0, 43, 0, 0, 0, 0, 43, 0, 
-	db	0, 0, 43, 0, 0, 0, 45, HLD, 0, 0, 0, 45, 0, 0, 0, 45, 
+	db	49, 0, 49, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 0, 
+	db	0, 0, 60, 0, 0, 0, 61, 0, 0, 0, 60, 0, 0, 0, 59, 0, 
+	db	0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 
+	db	60, 70, 60, 0, 70, 60, 0, 74, 70, 74, 75, 60, 74, 70, 60, 70, 
+	db	63, 74, 63, 0, 74, 63, 0, 77, 72, 75, 79, 60, 75, 72, 60, 72, 
+	db	58, 68, 58, 0, 68, 58, 0, 72, 68, 72, 75, 58, 72, 68, 58, 68, 
+	db	60, 70, 60, 0, 70, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 go4k_patterns_end
 %ifdef USE_SECTIONS
 section .g4kmuc2 data align=1
@@ -470,10 +462,10 @@ section .g4kmuc2 data align=1
 section .data
 %endif
 go4k_pattern_lists
-Instrument0List		db	1, 2, 3, 1, 
-Instrument1List		db	4, 5, 6, 7, 
-Instrument2List		db	8, 9, 10, 11, 
-Instrument4List		db	12, 13, 14, 15, 
+Instrument0List		db	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 
+Instrument1List		db	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 
+Instrument2List		db	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 
+Instrument5List		db	4, 5, 4, 6, 4, 5, 4, 6, 4, 5, 4, 6, 7, 0, 
 go4k_pattern_lists_end
 %ifdef USE_SECTIONS
 section .g4kmuc3 data align=1
@@ -514,7 +506,7 @@ GO4K_BEGIN_CMDDEF(Instrument2)
 	db GO4K_PAN_ID
 	db GO4K_OUT_ID
 GO4K_END_CMDDEF
-GO4K_BEGIN_CMDDEF(Instrument4)
+GO4K_BEGIN_CMDDEF(Instrument5)
 	db GO4K_ENV_ID
 	db GO4K_FST_ID
 	db GO4K_VCO_ID
@@ -585,8 +577,8 @@ GO4K_BEGIN_PARAMDEF(Instrument2)
 	GO4K_PAN	PANNING(64)
 	GO4K_OUT	GAIN(64), AUXSEND(0)
 GO4K_END_PARAMDEF
-GO4K_BEGIN_PARAMDEF(Instrument4)
-	GO4K_ENV	ATTAC(32),DECAY(64),SUSTAIN(64),RELEASE(64),GAIN(64)
+GO4K_BEGIN_PARAMDEF(Instrument5)
+	GO4K_ENV	ATTAC(58),DECAY(53),SUSTAIN(25),RELEASE(60),GAIN(68)
 	GO4K_FST	AMOUNT(120),DEST(0*MAX_UNIT_SLOTS+2+FST_SET)
 	GO4K_VCO	TRANSPOSE(64),DETUNE(64),PHASE(32),GATES(85),COLOR(80),SHAPE(64),GAIN(128),FLAGS(PULSE)
 	GO4K_VCO	TRANSPOSE(64),DETUNE(72),PHASE(32),GATES(85),COLOR(96),SHAPE(64),GAIN(128),FLAGS(TRISAW)
@@ -642,6 +634,6 @@ _go4k_delay_times
 	dw 1516
 	dw 1580
 	dw 1642
-	dw 10584
-	dw 21168
+	dw 11025
+	dw 22050
 %endif
