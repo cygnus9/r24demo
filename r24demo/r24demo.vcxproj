@@ -80,6 +80,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ExecutablePath>$(SolutionDir);$(VC_ExecutablePath_x86);$(CommonExecutablePath)</ExecutablePath>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,9 +98,15 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;winmm.lib</AdditionalDependencies>
-      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;winmm.lib;$(Configuration)\4klang.obj</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>
+      </IgnoreAllDefaultLibraries>
     </Link>
+    <CustomBuildStep>
+      <Command>$(SolutionDir)yasm.exe -fwin32 -o $(Configuration)\4klang.obj 4klang.asm</Command>
+      <Outputs>$(Configuration)\4klang.obj</Outputs>
+      <Inputs>4klang.inc</Inputs>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -120,8 +130,19 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/CRINKLER %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;winmm.lib;$(Configuration)\4klang.obj</AdditionalDependencies>
     </Link>
+    <CustomBuildStep>
+      <Command>$(SolutionDir)yasm.exe -fwin32 -o $(Configuration)\4klang.obj 4klang.asm</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(Configuration)\4klang.obj</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Inputs>4klang.inc</Inputs>
+      <TreatOutputAsContent>
+      </TreatOutputAsContent>
+    </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -177,9 +198,6 @@
     <ClCompile Include="glext-stubs.cpp" />
     <ClCompile Include="r24demo.cpp" />
     <ClCompile Include="transformations.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="4klang.obj" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
