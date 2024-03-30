@@ -120,7 +120,6 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions>/CRINKLER %(AdditionalOptions)</AdditionalOptions>
-      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;winmm.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -168,6 +167,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="simple.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="transformations.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="audio.cpp" />
@@ -176,6 +176,7 @@
     <ClCompile Include="glext-stubs.cpp" />
     <ClCompile Include="r24demo.cpp" />
     <ClCompile Include="simple.cpp" />
+    <ClCompile Include="transformations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="4klang.obj" />
