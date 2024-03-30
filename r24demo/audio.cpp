@@ -1,10 +1,13 @@
+#include <cassert>
+
 #include <Windows.h>
-#include <mmsystem.h>
 #include <mmreg.h>
+
+#include "audio.h"
 
 WAVEHDR waveHdr;
 
-void play_audio(void *buffer, unsigned size) {
+Playback play_audio(void *buffer, unsigned size) {
 	MMRESULT result;
 
 	WAVEFORMATEX wfx;
@@ -16,7 +19,7 @@ void play_audio(void *buffer, unsigned size) {
 	wfx.wBitsPerSample = 8 * sizeof(float);
 	wfx.cbSize = 0;
 
-	HWAVEOUT hWaveOut;
+	HWAVEOUT hWaveOut{ 0 };
 	result = waveOutOpen(&hWaveOut, WAVE_MAPPER, &wfx, 0, 0, CALLBACK_NULL | WAVE_FORMAT_DIRECT);
 	if (result != MMSYSERR_NOERROR) {
 		// whoops
@@ -38,5 +41,14 @@ void play_audio(void *buffer, unsigned size) {
 		result = result;
 	}
 
-	// Now we have to wait normally...
+	return Playback(hWaveOut);
+}
+
+
+float Playback::get_progress() const {
+	MMTIME time{ 0 };
+	waveOutGetPosition(m_hWaveOut, &time, sizeof(time));
+
+	assert(time.wType ==  TIME_BYTES);
+	return float(time.u.cb / float(44100 * 2 * sizeof(float)));
 }

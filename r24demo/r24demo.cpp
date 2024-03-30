@@ -258,8 +258,7 @@ int main()
     ShowWindow(window, 1);
     UpdateWindow(window);
 
-    play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
-
+    auto playback = play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
     bool running = true;
     while (running) {
         MSG msg;
@@ -276,11 +275,13 @@ int main()
         glClearColor(1.0f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        playback.get_progress();
         quad.render();
 
         SwapBuffers(gldc);
     }
 
+    DestroyWindow(window);
     return 0;
 }
 
