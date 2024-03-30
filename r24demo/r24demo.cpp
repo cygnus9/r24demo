@@ -257,9 +257,11 @@ int main()
     FBO depthfbo(X, Y);
     FBO hbloomfbo(512, 512);
     FBO positions(tsize, tsize);
+    FBO colors(tsize, tsize);
     FBO velocities(tsize, tsize);
+    FBO velocitiesDest(tsize, tsize);
 
-    Particles particles(tsize, positions.getTexture(), 0);
+    Particles particles(tsize, positions.getTexture(), colors.getTexture());
     Stepper stepper(velocities.getTexture());
 
     {
@@ -270,6 +272,20 @@ int main()
 
                 glWindowPos2i(x, y);
                 float pixel[4] = { cos(p * 2 * 3.14) * 5, sin(p * 2 * 3.14) * 5, 0, 0 };
+                glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
+            }
+        }
+    }
+
+    {
+        auto fbo = colors.select();
+        for (int x = 0; x < tsize; x++) {
+            for (int y = 0; y < tsize; y++) {
+                glWindowPos2i(x, y);
+                float one[4] = { 0.75, 0.9, 0.15, 1.0 };
+                float two[4] = { 0.75, 0.65, 0.4, 1.0 };
+
+                float* pixel = x % 2 ? one : two;
                 glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
             }
         }

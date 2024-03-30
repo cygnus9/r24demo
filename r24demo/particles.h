@@ -38,8 +38,6 @@ public:
 
                 highp vec4 color = vec4(colortex.rgb, 1.0);
 
-                color = vec4(1.0, 1.0, 1.0, 1.0);
-
                 highp vec4 projectedCenter = projection * aspect * modelview * vec4(center, 1.0);
                 highp vec4 worldCenter = modelview * vec4(center, 1.0);
                 highp vec4 worldAutofocus = vec4(autoFocus, 1.0);
