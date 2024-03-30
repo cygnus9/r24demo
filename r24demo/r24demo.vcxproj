@@ -175,7 +175,6 @@
     <ClCompile Include="geometry.cpp" />
     <ClCompile Include="glext-stubs.cpp" />
     <ClCompile Include="r24demo.cpp" />
-    <ClCompile Include="simple.cpp" />
     <ClCompile Include="transformations.cpp" />
   </ItemGroup>
   <ItemGroup>
