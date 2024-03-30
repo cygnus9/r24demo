@@ -178,6 +178,13 @@ window_callback(HWND window, UINT msg, WPARAM wparam, LPARAM lparam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+    case WM_KEYDOWN:
+        if (wparam == VK_ESCAPE) {
+            PostQuitMessage(0);
+        } else {
+            result = DefWindowProcA(window, msg, wparam, lparam);
+        }
+        break;
     default:
         result = DefWindowProcA(window, msg, wparam, lparam);
         break;
