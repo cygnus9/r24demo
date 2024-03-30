@@ -30,24 +30,30 @@ public:
 				f_color = textureLod(tex, v_texcoor, 0.0) * v_color;
 			}		)sl";
 
-	Stepper(GLuint tex) : Simple(), m_tex(tex) {
+	Stepper() : Simple() {
 		static const Geometry::attrib_defs vertex_defs[] = { {"position", 2}, {"texcoor", 2 }, { nullptr } };
 		static const struct {
 			vec2 pos;
 			vec2 texcoor;
-		} vertices[] = { { {-1, -1}, { 0, 0 } }, { { -1, 1 }, { 1, 0 } }, { {1, 1}, { 1, 1 } }, { {1, -1}, { 0, 1 } } };
+		} vertices[] = { { {-1, -1}, { 0, 0 } }, { { 1, -1 }, { 1, 0 } }, { {1, 1}, { 1, 1 } }, { {-1, 1}, { 0, 1 } } };
 
 		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)vertices, sizeof(vertices));
-
-		static const Geometry::attrib_defs instance_defs[] = { {"instance", 1}, {nullptr} };
-		static const float instances[] = { 0, 1 };
-
-		GLuint instance_buffer = Geometry::create_vertex_buffer((void*)instances, sizeof(instances));
 
 		init(vertex_code, shader_code, vertex_buffer, ARRAYSIZE(vertices), vertex_defs,
 			0, 1, nullptr);
 
 		m_objcolor = vec4{ 1.0, 1.0, 1.0, 1.0 };
+
+		m_srcBlend = GL_SRC_ALPHA;
+		m_dstBlend = GL_ONE;
+	}
+
+	void setVelocityTex(GLuint tex) {
+		m_tex = tex;
+	}
+
+	void setColor(vec4 color) {
+		m_objcolor = color;
 	}
 
 	void uniforms(GLuint program) {

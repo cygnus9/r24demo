@@ -25,7 +25,7 @@ public:
 
 		Geometry::use_program(m_program);
 		err = glGetError();
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		glBlendFunc(m_srcBlend, m_dstBlend);
 		err = glGetError();
 		Geometry::use_vao(m_vao);
 		err = glGetError();
@@ -57,5 +57,9 @@ private:
 	GLuint m_program;
 	GLuint m_vao;
 	matrix4f m_model_view;
+
+protected:
+	GLuint m_srcBlend = GL_SRC_ALPHA;
+	GLuint m_dstBlend = GL_ONE_MINUS_SRC_ALPHA;
 };
 

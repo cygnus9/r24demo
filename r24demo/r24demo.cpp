@@ -12,6 +12,7 @@
 #include "particles.h"
 #include "stepper.h"
 #include "quad.h"
+#include "accelerator.h"
 #include "transformations.h"
 
 typedef HGLRC WINAPI wglCreateContextAttribsARB_type(HDC hdc, HGLRC hShareContext, const int* attribList);
@@ -240,6 +241,36 @@ create_window(HINSTANCE inst)
 
 float AUDIO_BUFFER[MAX_SAMPLES * 2];
 
+int nextParticle = 0;
+void addParticle(FBO& positions, FBO& colors, FBO& velocities, int tsize, vec3 pos, vec3 velocity, vec3 color, float t) {
+    int x = nextParticle / tsize;
+    int y = nextParticle % tsize;
+
+    {
+        auto fbo = positions.select();
+        glWindowPos2i(x, y);
+        float pixel[4] = { pos.x, pos.y, pos.z, 0};
+        glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
+    }
+
+    {
+        auto fbo = colors.select();
+        glWindowPos2i(x, y);
+        float pixel[4] = { color.x, color.y, color.z, 0 };
+        glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
+    }
+
+    {
+        auto fbo = velocities.select();
+        glWindowPos2i(x, y);
+        float pixel[4] = { velocity.x, velocity.y, velocity.z, t };
+        // float pixel[4] = { 0,0, 0, 0 };
+        glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
+    }
+
+    nextParticle = (nextParticle + 1) % (tsize * tsize);
+}
+
 int main()
 {
     HWND window = create_window(0);
@@ -251,7 +282,7 @@ int main()
 
     const unsigned X = 1920;
     const unsigned Y = 1080;
-    const int tsize = 4;
+    const int tsize = 32;
 
     FBO mainfbo(X, Y);
     FBO depthfbo(X, Y);
@@ -261,54 +292,20 @@ int main()
     FBO velocities(tsize, tsize);
     FBO velocitiesDest(tsize, tsize);
 
+    FBO* currentVelocities = &velocities;
+    FBO* otherVelocities = &velocitiesDest;
+
     Particles particles(tsize, positions.getTexture(), colors.getTexture());
-    Stepper stepper(velocities.getTexture());
+    Stepper stepper;
+    Accelerator accelerator(positions.getTexture());
 
-    {
-        auto fbo = positions.select();
-        for (int x = 0; x < tsize; x++) {
-            for (int y = 0; y < tsize; y++) {
-                float p = ((float)(x * tsize + y)) / (tsize * tsize);
-
-                glWindowPos2i(x, y);
-                float pixel[4] = { cos(p * 2 * 3.14) * 5, sin(p * 2 * 3.14) * 5, 0, 0 };
-                glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
-            }
-        }
-    }
-
-    {
-        auto fbo = colors.select();
-        for (int x = 0; x < tsize; x++) {
-            for (int y = 0; y < tsize; y++) {
-                glWindowPos2i(x, y);
-                float one[4] = { 0.75, 0.9, 0.15, 1.0 };
-                float two[4] = { 0.75, 0.65, 0.4, 1.0 };
-
-                float* pixel = x % 2 ? one : two;
-                glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
-            }
-        }
-    }
-
-    {
-        auto fbo = velocities.select();
-        for (int x = 1; x < tsize; x++) {
-            for (int y = 0; y < tsize; y++) {
-                float p = ((float)(x * tsize + y)) / (tsize * tsize);
-
-                glWindowPos2i(x, y);
-                float pixel[4] = { 0.0, -.1, 0.0, .03 };
-                glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
-            }
-        }
-    }
 
     ShowWindow(window, 1);
     UpdateWindow(window);
 
     auto playback = play_audio(AUDIO_BUFFER, MAX_SAMPLES * 2 * sizeof(float));
     bool running = true;
+    vec3 lastpos = { 0, 0, 0 };
     while (running) {
         MSG msg;
         while (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE)) {
@@ -329,9 +326,9 @@ int main()
         {
             matrix4f i, j;
             identity(i);
-            rotate(i, j, t * 20, 0, 1, 0);
+            rotate(i, j, 0, 0, 1, 0);
             scale(j, i, 0.5, 0.5, 0.5);
-            translate(i, particles.m_modelview, 0, 0, -10.0);
+            translate(i, particles.m_modelview, 0, 0, -30.0);
             frustum(particles.m_projection, -1, 1, -1, 1, 1.0, 10000.0);
 
             particles.render();
@@ -343,8 +340,29 @@ int main()
         {
             // Step all the particles
             auto fbo = positions.select();
+            stepper.setVelocityTex(currentVelocities->getTexture());
+            stepper.setColor(vec4{ 1,1,1,0.5 / 60.0 });
             stepper.render();
         }
+
+        {
+            // Step all the accelerations
+            auto fbo = otherVelocities->select();
+            accelerator.setVelocityTex(currentVelocities->getTexture());
+            accelerator.render();
+
+            // Swap the velocity FBOs
+            FBO* tmp = otherVelocities;
+            otherVelocities = currentVelocities;
+            currentVelocities = tmp;
+        }
+
+        float dt = 1.0 / 60.0;
+        vec3 pos = { sin(t * 7) * 20, cos(t * 9) * 14, sin(t * 3) * 8 };
+        vec3 velocity = { (pos.x - lastpos.x) / dt , (pos.y - lastpos.y) / dt , (pos.z - lastpos.z) / dt };
+        lastpos = pos;
+        vec3 color = { 0.8, 0.6, 0.1 };
+        addParticle(positions, colors, velocities, tsize, pos, velocity, color, t);
     }
 
     DestroyWindow(window);

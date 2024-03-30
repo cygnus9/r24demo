@@ -43,7 +43,7 @@ public:
                 highp vec4 worldAutofocus = vec4(autoFocus, 1.0);
 
                 highp float scale = abs((worldCenter.z - worldAutofocus.z) * 0.01);
-                scale = clamp(scale, 0.01, 0.08);
+                scale = clamp(scale, 0.005, 0.08);
 
                 gl_Position = (vec4(position, 0.0, 1.0) * scale * aspect + normalize(projectedCenter));
                 highp float brightness = 0.001/pow(scale, 2.0);
@@ -77,9 +77,12 @@ public:
         scale(i, m_aspect, 9.0 / 16.0, 1.0, 1.0);
 
         m_objcolor = vec4 { 1.0, 1.0, 1.0, 1.0 };
-        m_autoFocus = vec3{ 0.0, 0.0, -10.0 };
+        m_autoFocus = vec3{ 0.0, 0.0, -30.0 };
         m_positionTex = positionTex;
         m_colorTex = colorTex;
+
+        m_srcBlend = GL_SRC_ALPHA;
+        m_dstBlend = GL_ONE;
 
 		static const Geometry::attrib_defs vertex_defs[] = { {"position", 2}, {nullptr} };
 		static const vec2 vertices[] = { {-1, -1}, {-1, 1}, {1, 1}, {1, -1} };
