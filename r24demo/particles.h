@@ -71,12 +71,12 @@ public:
 		)sl";
 
 	Particles(int tsize, GLuint positionTex, GLuint colorTex) : Simple() {
-        identity((float(*)[4]) & m_modelview);
-        identity((float(*)[4]) & m_projection);
+        identity(m_modelview);
+        identity(m_projection);
 
         matrix4f i;
-        identity((float(*)[4]) & i);
-        scale((float(*)[4]) & i, (float(*)[4]) & m_aspect, 9.0 / 16.0, 1.0, 1.0);
+        identity(i);
+        scale(i, m_aspect, 9.0 / 16.0, 1.0, 1.0);
 
         m_objcolor = vec4 { 1.0, 1.0, 1.0, 1.0 };
         m_autoFocus = vec3{ 0.0, 0.0, -10.0 };

@@ -27,4 +27,16 @@ struct vec4 {
 
 struct matrix4f {
 	vec4 m[4];
+
+	float get(int x, int y) const {
+		return ((float*)(&m[x]))[y];
+	}
+
+	void set(int x, int y, float value) {
+		((float*)(&m[x]))[y] = value;
+	}
+
+	void inc(int x, int y, float value) {
+		((float*)(&m[x]))[y] += value;
+	}
 };

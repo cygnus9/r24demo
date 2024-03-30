@@ -312,11 +312,11 @@ int main()
         const auto t = playback.get_progress();
         {
             matrix4f i, j;
-            identity((float(*)[4]) & i);
-            rotate((float(*)[4]) & i, (float(*)[4]) & j, t * 20, 0, 1, 0);
-            scale((float(*)[4]) & j, (float(*)[4]) & i, 0.5, 0.5, 0.5);
-            translate((float(*)[4]) & i, (float(*)[4]) & particles.m_modelview, 0, 0, -10.0);
-            frustum((float(*)[4]) & particles.m_projection, -1, 1, -1, 1, 1.0, 10000.0);
+            identity(i);
+            rotate(i, j, t * 20, 0, 1, 0);
+            scale(j, i, 0.5, 0.5, 0.5);
+            translate(i, particles.m_modelview, 0, 0, -10.0);
+            frustum(particles.m_projection, -1, 1, -1, 1, 1.0, 10000.0);
 
             particles.render();
         }
