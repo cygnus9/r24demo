@@ -37,7 +37,7 @@ void translate(const matrix4f &mtx_in, matrix4f &mtx_out, const float x, const f
 }
 
 void scale(const matrix4f &mtx_in, matrix4f &mtx_out, const float x, const float y, const float z) {
-    const matrix4f &mtx_transform = {
+    const matrix4f mtx_transform = {
         vec4 { x, 0, 0, 0 },
         vec4 { 0, y, 0, 0 },
         vec4 { 0, 0, z, 0 },
@@ -51,7 +51,7 @@ void xrotate(const matrix4f &mtx_in, matrix4f &mtx_out, float theta) {
     const float cosT = std::cos(t);
     const float sinT = std::sin(t);
 
-    const matrix4f &mtx_transform = {
+    const matrix4f mtx_transform = {
         vec4 { 1,    0,    0, 0 },
         vec4 { 0, cosT, sinT, 0 },
         vec4 { 0, sinT, cosT, 0 },
@@ -65,7 +65,7 @@ void yrotate(const matrix4f &mtx_in, matrix4f &mtx_out, float theta) {
     const float cosT = std::cos(t);
     const float sinT = std::sin(t);
 
-    const matrix4f &mtx_transform = {
+    const matrix4f mtx_transform = {
         vec4 {  cosT, 0, sinT, 0 },
         vec4 {     0, 1,    0, 0 },
         vec4 { -sinT, 0, cosT, 0 },
@@ -79,7 +79,7 @@ void zrotate(const matrix4f &mtx_in, matrix4f &mtx_out, float theta) {
     const float cosT = std::cos(t);
     const float sinT = std::sin(t);
 
-    const matrix4f &mtx_transform = {
+    const matrix4f mtx_transform = {
         vec4 { cosT, -sinT, 0, 0 },
         vec4 { sinT,  cosT, 0, 0 },
         vec4 {    0,     0, 1, 0 },
@@ -113,11 +113,7 @@ void frustum(matrix4f &mtx_out, float left, float right, float bottom, float top
     assert(bottom != top  );
     assert(znear  != zfar );
 
-    for (int x = 0; x < 4; ++x) {
-        for (int y = 0; y < 4; ++y) {
-            mtx_out.set(x, y, 0);
-        }
-    }
+    memset(&mtx_out, 0, sizeof(mtx_out));
 
     mtx_out.set(0, 0, +2.0f * znear / (right - left));
     mtx_out.set(2, 0, (right + left) / (right - left));
