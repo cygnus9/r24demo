@@ -42,6 +42,18 @@ public:
 
 	virtual void uniforms(GLuint program) { }
 
+	typedef struct {
+		vec2 p;
+		vec2 t;
+	} POS_TEX;
+
+	static const Geometry::attrib_defs quad_defs[];
+	static const vec2 quad_vertices[];
+	static const Geometry::attrib_defs texquad_defs[];
+	static const POS_TEX texquad_vertices[];
+
+
+
 private:
 	const char* m_vertex_code;
 	const char* m_shader_code;
@@ -63,3 +75,8 @@ protected:
 	GLuint m_dstBlend = GL_ONE_MINUS_SRC_ALPHA;
 };
 
+const Geometry::attrib_defs Simple::quad_defs[] = { {"position", 2}, { nullptr } };
+const vec2 Simple::quad_vertices[4] = { {-1, 1}, {-1, -1}, {1, 1}, {1, -1} };
+
+const Geometry::attrib_defs Simple::texquad_defs[] = { {"position", 2}, {"texcoor", 2 }, { nullptr } };
+const Simple::POS_TEX Simple::texquad_vertices[] = { { {1, -1}, { 1, 0 } }, { { -1, -1 }, { 0, 0 } }, { {1, 1}, { 1, 1 } }, { {-1, 1}, { 0, 1 } } };

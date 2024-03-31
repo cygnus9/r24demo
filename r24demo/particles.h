@@ -5,27 +5,23 @@
 #include "simple.h"
 #include "transformations.h"
 
-#define MAXPARTICLES 65536
+#define MAXPARTICLES 1048576
 vec2 instances[MAXPARTICLES];
 
 class Particles : public Simple {
-private:
-    static const int TSIZE = 4;
-
 public:
-	const char* vertex_code = R"sl(#version 300 es
-            uniform mat4 modelview;
-            uniform mat4 projection;
-            uniform mat4 aspect;
-            uniform mat4 rotation;
+	const char* vertex_code = R"sl(#version 430
+            layout(location = 0) uniform mat4 modelview;
+            layout(location = 1) uniform mat4 projection;
+            layout(location = 2) uniform mat4 aspect;
 
-            uniform vec4 objcolor;
-            uniform float time;
-            uniform float lifetime;
-            uniform vec3 autoFocus;
+            layout(location = 3) uniform vec4 objcolor;
+            layout(location = 4) uniform float time;
+            layout(location = 5) uniform float lifetime;
+            layout(location = 6) uniform vec3 autoFocus;
 
-            uniform sampler2D positionTex;
-            uniform sampler2D colorTex;
+            layout(location = 7) uniform sampler2D positionTex;
+            layout(location = 8) uniform sampler2D colorTex;
 
             in highp vec2 position;
             in highp vec2 texcoor;
@@ -39,9 +35,6 @@ public:
                 highp float birth = colortex.w;
                 highp vec3 center = postex.xyz;
 
-                //center = vec3(0.0, 0.0, 0.0);
-                //colortex = vec4(1.0, 1.0, 1.0, 0.0);
-
                 highp vec4 color = vec4(colortex.rgb, 1.0);
 
                 highp vec4 projectedCenter = projection * aspect * modelview * vec4(center, 1.0);
@@ -49,11 +42,10 @@ public:
                 highp vec4 worldAutofocus = vec4(autoFocus, 1.0);
 
                 highp float scale = abs((worldCenter.z - worldAutofocus.z) * 0.002);
-                scale = clamp(scale, 0.003, 0.8);
+                scale = clamp(scale, 0.0025, 0.8);
 
                 gl_Position = (vec4(position, 0.0, 1.0) * scale * aspect + normalize(projectedCenter));
-                highp float brightness = 0.0005/pow(scale, 2.0);
-                //brightness *= 0.001;
+                highp float brightness = 0.0001/pow(scale, 2.0);
                 highp float sparkle = (1.0 + sin((time - birth) * 10.0)) / 2.0;
                 highp float fade = clamp(1.0 - ((time - birth) / lifetime), 0.0, 1.0);
 
@@ -63,7 +55,7 @@ public:
             } 
 		)sl";
 
-	const char* shader_code = R"sl(#version 300 es
+	const char* shader_code = R"sl(#version 430
             in highp vec4 v_color;
             in highp vec2 v_texcoor;
             out highp vec4 f_color;
@@ -90,10 +82,7 @@ public:
         m_srcBlend = GL_SRC_ALPHA;
         m_dstBlend = GL_ONE;
 
-		static const Geometry::attrib_defs vertex_defs[] = { {"position", 2}, {nullptr} };
-		static const vec2 vertices[] = { {-1, 1}, {-1, -1}, {1, 1}, {1, -1} };
-
-		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)vertices, sizeof(vertices));
+		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)Simple::quad_vertices, sizeof(Simple::quad_vertices));
 
 		static const Geometry::attrib_defs instance_defs[] = { {"texcoor", 2}, {nullptr} };
 
@@ -106,7 +95,7 @@ public:
 
 		GLuint instance_buffer = Geometry::create_vertex_buffer((void*)instances, sizeof(instances));
 
-		init(vertex_code, shader_code, vertex_buffer, ARRAYSIZE(vertices), vertex_defs,
+		init(vertex_code, shader_code, vertex_buffer, ARRAYSIZE(Simple::quad_vertices), Simple::quad_defs,
 			instance_buffer, tsize * tsize, instance_defs);
 	}
 
@@ -115,14 +104,15 @@ public:
     }
 
     void uniforms(GLuint program) {
-        Geometry::uniform(program, "modelview", m_modelview);
-        Geometry::uniform(program, "projection", m_projection);
-        Geometry::uniform(program, "aspect", m_aspect);
+        glUniformMatrix4fv(0, 1, false, &m_modelview.m[0].x);
+        glUniformMatrix4fv(1, 1, false, &m_projection.m[0].x);
+        glUniformMatrix4fv(2, 1, false, &m_aspect.m[0].x);
 
-        Geometry::uniform(program, "objcolor", m_objcolor);
-        Geometry::uniform(program, "time", m_t);
-        Geometry::uniform(program, "lifetime", (float)10.0);
-        Geometry::uniform(program, "autoFocus", m_autoFocus);
+        glUniform4fv(3, 1, &m_objcolor.x);
+        glUniform1fv(4, 1, &m_t);
+        static float lifetime = 10.0;
+        glUniform1fv(5, 1, &lifetime);
+        glUniform3fv(6, 1, &m_autoFocus.x);
 
         Geometry::texture(program, "positionTex", 0, m_positionTex);
         Geometry::texture(program, "colorTex", 1, m_colorTex);

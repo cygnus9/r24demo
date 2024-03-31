@@ -31,15 +31,8 @@ public:
 			}		)sl";
 
 	Stepper() : Simple() {
-		static const Geometry::attrib_defs vertex_defs[] = { {"position", 2}, {"texcoor", 2 }, { nullptr } };
-		static const struct {
-			vec2 pos;
-			vec2 texcoor;
-		} vertices[] = { { {1, -1}, { 1, 0 } }, { { -1, -1 }, { 0, 0 } }, { {1, 1}, { 1, 1 } }, { {-1, 1}, { 0, 1 } } };
-
-		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)vertices, sizeof(vertices));
-
-		init(vertex_code, shader_code, vertex_buffer, ARRAYSIZE(vertices), vertex_defs,
+		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)Simple::texquad_vertices, sizeof(Simple::texquad_vertices));
+		init(vertex_code, shader_code, vertex_buffer, ARRAYSIZE(Simple::texquad_vertices), Simple::texquad_defs,
 			0, 1, nullptr);
 
 		m_objcolor = vec4{ 1.0, 1.0, 1.0, 1.0 };

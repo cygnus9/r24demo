@@ -89,7 +89,7 @@ GLuint Geometry::create_vertex_buffer(void* p, size_t size) {
     err = glGetError();
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     err = glGetError();
-    glBufferData(GL_ARRAY_BUFFER, size, p, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, p, GL_STATIC_DRAW);
     err = glGetError();
     return buffer;
 }

@@ -57,6 +57,6 @@ GLuint FBO::getData(float* pixels) {
 
 GLuint FBO::setData(float* pixels) {
     glBindTexture(GL_TEXTURE_2D, m_tex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 128, 128, 0, GL_RGBA, GL_FLOAT, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, m_width, m_height, 0, GL_RGBA, GL_FLOAT, pixels);
     return glGetError();
 }

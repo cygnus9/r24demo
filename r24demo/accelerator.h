@@ -35,20 +35,14 @@ public:
                 highp vec3 currentSpeed = textureLod(velocityTex, v_texcoor, 0.0).xyz;
                 highp vec3 currentPos = textureLod(positionTex, v_texcoor, 0.0).xyz;
                 highp vec3 dist = currentPos - singularity;
-                f_color = vec4(currentSpeed * (1.0 - (drag * dt * length(currentSpeed))) - normalize(dist) * pow(length(dist), -2.0) * dt * gravity + vec3(0, -10, 0) * dt, 1.0);
+                f_color = vec4(currentSpeed * (1.0 - (drag * dt * length(currentSpeed))) - normalize(dist) * pow(length(dist), -2.0) * dt * gravity + vec3(0, 0, 0) * dt, 1.0);
             }
 		)sl";
 
 	Accelerator(GLuint positionTex) : Simple(), m_positionTex(positionTex) {
-		static const Geometry::attrib_defs vertex_defs[] = { {"position", 2}, {"texcoor", 2 }, { nullptr } };
-		static const struct {
-			vec2 pos;
-			vec2 texcoor;
-		} vertices[] = { { {1, -1}, { 1, 0 } }, { { -1, -1 }, { 0, 0 } }, { {1, 1}, { 1, 1 } }, { {-1, 1}, { 0, 1 } } };
+		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)Simple::texquad_vertices, sizeof(Simple::texquad_vertices));
 
-		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)vertices, sizeof(vertices));
-
-		init(vertex_code, shader_code, vertex_buffer, ARRAYSIZE(vertices), vertex_defs,
+		init(vertex_code, shader_code, vertex_buffer, ARRAYSIZE(Simple::texquad_vertices), Simple::texquad_defs,
 			0, 1, nullptr);
 
 		m_objcolor = vec4{ 1.0, 1.0, 1.0, 1.0 };

@@ -278,7 +278,7 @@ int main()
 
     const unsigned X = 1920;
     const unsigned Y = 1080;
-    const int tsize = 128;
+    const int tsize = 512;
 
     FBO mainfbo(X, Y);
     FBO depthfbo(X, Y);
@@ -294,7 +294,6 @@ int main()
     Particles particles(tsize, positions.getTexture(), colors.getTexture());
     Stepper stepper;
     Accelerator accelerator(positions.getTexture());
-    Quad quad;
 
     ShowWindow(window, 1);
     UpdateWindow(window);
@@ -338,14 +337,12 @@ int main()
                 -35.0 + 4 *  sin(t * 0.345 * (.5 + .5 * cos(t * 0.417)))
             );
 
-            frustum(particles.m_projection, -1, 1, -1, 1, 1.0, 10000.0);
+            frustum(particles.m_projection, -0.5, .5, -.5, .5, 1.0, 10000.0);
 
             particles.setTime(t);
             particles.render();
             //quad.render();
         }
-
-        SwapBuffers(gldc);
 
         {
             // Step all the particles
@@ -368,34 +365,44 @@ int main()
             currentVelocities = tmp;
         }
 
-        vec3 pos = { sin(t * 7) * 20, cos(t * 5) * 14, sin(t * 9) * 8 };
-        vec3 velocity = { (pos.x - lastpos.x) / dt , (pos.y - lastpos.y) / dt , (pos.z - lastpos.z) / dt };
-        lastpos = pos;
-        vec3 color1 = { 0.04, 0.03, 0.005 };
-        vec3 color2 = { 0.04, 0.035, 0.04 };
-
         static float pos_data[MAXPARTICLES];
         static float color_data[MAXPARTICLES];
         static float vel_data[MAXPARTICLES];
 
         positions.getData(pos_data);
         colors.getData(color_data);
-        velocities.getData(vel_data);
+        currentVelocities->getData(vel_data);
 
-        for (int i = 0; i < 2000 * dt && i < 300; i++) {
-            float rnd = fmod(t * 1000 + i * 0.123, 1) * 5 - 2.5;
-            float rnd2 = fmod(t * 997 + i * rnd, 1) * 5 - 2.5;
-            float rnd3 = fmod(t * 993 + i * rnd2, 1) * 5 - 2.5;
-            vec3 newpos = { pos.x + rnd, pos.y + rnd2, pos.z + rnd3 };
-            vec3 newvelocity = { velocity.x + rnd2, velocity.y + rnd3, velocity.z + rnd };
-            vec3* color = i % 2 ? &color1 : &color2;
+        for (int p = 0; p < 16000*dt; p++) {
+            float ddt = t - dt + (dt * float(p) / 10.0);
+            vec3 pos = { sin(ddt * 7) * 20, cos(ddt * 5) * 14 + 10, sin(ddt * 9) * 8 };
 
-            addParticle(pos_data, color_data, vel_data, tsize, newpos, newvelocity, *color, t + (4*rnd));
+            vec3 posdiff = { (pos.x - lastpos.x)  , (pos.y - lastpos.y) , (pos.z - lastpos.z) };
+            vec3 velocity = { (pos.x - lastpos.x) / dt , (pos.y - lastpos.y) / dt , (pos.z - lastpos.z) / dt };
+            lastpos = pos;
+            vec3 color1 = { 0.04, 0.03, 0.005 };
+            vec3 color2 = { 0.04, 0.035, 0.04 };
+
+            int n = 1;
+            for (int i = 0; i < n; i++) {
+                float d = 1;
+                float rnd = fmod(ddt * 1000 + p * 0.123, 1) * 4 - 2;
+                float rnd2 = fmod(ddt * 997 + p * rnd, 1) * 4 - 2;
+                float rnd3 = fmod(ddt * 993 + p * rnd2, 1) * 4 - 2;
+                vec3 newpos = { pos.x + (rnd/4.0) + (posdiff.x * d), pos.y + (rnd2/4.0) + (posdiff.y * d), pos.z + (rnd3/4.0) + (posdiff.z * d) };
+                vec3 newvelocity = { velocity.x + rnd2 * 5, velocity.y + rnd3 * 5, velocity.z + rnd * 5};
+                vec3* color = p % 2 ? &color1 : &color2;
+
+                addParticle(pos_data, color_data, vel_data, tsize, newpos, newvelocity, *color, ddt + (4 * rnd));
+            }
         }
 
         positions.setData(pos_data);
         colors.setData(color_data);
-        velocities.setData(vel_data);
+        currentVelocities->setData(vel_data);
+
+        SwapBuffers(gldc);
+
     }
 
 
