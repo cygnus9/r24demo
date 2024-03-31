@@ -274,8 +274,6 @@ int main()
     HGLRC glrc = init_opengl(gldc);
     init_glext_stubs();
 
-    glViewport(0, 0, width, height);
-
     _4klang_render(AUDIO_BUFFER);
 
     const unsigned X = 1920;
@@ -317,6 +315,7 @@ int main()
             }
         }
 
+        glViewport(0, 0, width, height);
         glEnable(GL_BLEND);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -400,7 +399,8 @@ int main()
     }
 
 
-//    DestroyWindow(window);
+    exit(0);
+//  DestroyWindow(window);
     return 0;
 }
 
