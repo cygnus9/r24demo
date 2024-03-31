@@ -39,13 +39,16 @@ public:
                 highp float birth = colortex.w;
                 highp vec3 center = postex.xyz;
 
+                //center = vec3(0.0, 0.0, 0.0);
+                //colortex = vec4(1.0, 1.0, 1.0, 0.0);
+
                 highp vec4 color = vec4(colortex.rgb, 1.0);
 
                 highp vec4 projectedCenter = projection * aspect * modelview * vec4(center, 1.0);
                 highp vec4 worldCenter = modelview * vec4(center, 1.0);
                 highp vec4 worldAutofocus = vec4(autoFocus, 1.0);
 
-                highp float scale = abs((worldCenter.z - worldAutofocus.z) * 0.001);
+                highp float scale = abs((worldCenter.z - worldAutofocus.z) * 0.002);
                 scale = clamp(scale, 0.003, 0.8);
 
                 gl_Position = (vec4(position, 0.0, 1.0) * scale * aspect + normalize(projectedCenter));
@@ -88,7 +91,7 @@ public:
         m_dstBlend = GL_ONE;
 
 		static const Geometry::attrib_defs vertex_defs[] = { {"position", 2}, {nullptr} };
-		static const vec2 vertices[] = { {-1, -1}, {-1, 1}, {1, 1}, {1, -1} };
+		static const vec2 vertices[] = { {-1, 1}, {-1, -1}, {1, 1}, {1, -1} };
 
 		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)vertices, sizeof(vertices));
 

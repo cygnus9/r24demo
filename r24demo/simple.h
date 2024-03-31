@@ -34,7 +34,7 @@ public:
 		Geometry::configure_attribs(m_program, m_instance_defs, m_instance_buffer, 1);
 		err = glGetError();
 		uniforms(m_program);
-		Geometry::render(GL_QUADS, m_vertex_count, m_instance_count);
+		Geometry::render(GL_TRIANGLE_STRIP, m_vertex_count, m_instance_count);
 		err = glGetError();
 		Geometry::use_program(0);
 		err = glGetError();

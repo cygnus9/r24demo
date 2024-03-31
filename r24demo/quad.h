@@ -27,7 +27,7 @@ public:
 
 	Quad() : Simple() {
 		static const Geometry::attrib_defs vertex_defs[] = { {"position", 2}, {nullptr} };
-		static const vec2 vertices[] = { {-1, -1}, {-1, 1}, {0, 1}, {0, -1} };
+		static const vec2 vertices[] = { {-1, 1}, {-1, -1}, {0, 1}, {0, -1} };
 
 		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)vertices, sizeof(vertices));
 

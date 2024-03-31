@@ -156,7 +156,7 @@ init_opengl(HDC real_dc)
     int gl33_attribs[] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
         WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_PROFILE_MASK_ARB, /*WGL_CONTEXT_CORE_PROFILE_BIT_ARB*/0,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
         0,
     };
 
@@ -197,6 +197,8 @@ window_callback(HWND window, UINT msg, WPARAM wparam, LPARAM lparam)
     return result;
 }
 
+int width, height;
+
 static HWND
 create_window(HINSTANCE inst)
 {
@@ -217,11 +219,14 @@ create_window(HINSTANCE inst)
     MONITORINFO mi = { sizeof(mi) };
     GetMonitorInfo(hmon, &mi);
 
+    width = mi.rcMonitor.right - mi.rcMonitor.left;
+    height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+
     HWND window = CreateWindowExA(
         0,
         window_class.lpszClassName,
         "",
-        WS_OVERLAPPEDWINDOW,
+        WS_POPUP | WS_VISIBLE,
         mi.rcMonitor.left,
         mi.rcMonitor.top,
         mi.rcMonitor.right - mi.rcMonitor.left,
@@ -242,31 +247,22 @@ create_window(HINSTANCE inst)
 float AUDIO_BUFFER[MAX_SAMPLES * 2];
 
 int nextParticle = 0;
-void addParticle(FBO& positions, FBO& colors, FBO& velocities, int tsize, vec3 pos, vec3 velocity, vec3 color, float t) {
-    int x = nextParticle / tsize;
-    int y = nextParticle % tsize;
+void addParticle(float *positions, float *colors, float *velocities, int tsize, vec3 pos, vec3 velocity, vec3 color, float t) {
+    float pixel[4] = { pos.x, pos.y, pos.z, 0};
+    positions[nextParticle * 4 + 0] = pos.x;
+    positions[nextParticle * 4 + 1] = pos.y;
+    positions[nextParticle * 4 + 2] = pos.z;
+    positions[nextParticle * 4 + 3] = 0;
 
-    {
-        auto fbo = positions.select();
-        glWindowPos2i(x, y);
-        float pixel[4] = { pos.x, pos.y, pos.z, 0};
-        glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
-    }
+    colors[nextParticle * 4 + 0] = color.x;
+    colors[nextParticle * 4 + 1] = color.y;
+    colors[nextParticle * 4 + 2] = color.z;
+    colors[nextParticle * 4 + 3] = t;
 
-    {
-        auto fbo = colors.select();
-        glWindowPos2i(x, y);
-        float pixel[4] = { color.x, color.y, color.z, t };
-        glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
-    }
-
-    {
-        auto fbo = velocities.select();
-        glWindowPos2i(x, y);
-        float pixel[4] = { velocity.x, velocity.y, velocity.z, 0 };
-        // float pixel[4] = { 0,0, 0, 0 };
-        glDrawPixels(1, 1, GL_RGBA, GL_FLOAT, pixel);
-    }
+    velocities[nextParticle * 4 + 0] = velocity.x;
+    velocities[nextParticle * 4 + 1] = velocity.y;
+    velocities[nextParticle * 4 + 2] = velocity.z;
+    velocities[nextParticle * 4 + 3] = 0;
 
     nextParticle = (nextParticle + 1) % (tsize * tsize);
 }
@@ -277,6 +273,8 @@ int main()
     HDC gldc = GetDC(window);
     HGLRC glrc = init_opengl(gldc);
     init_glext_stubs();
+
+    glViewport(0, 0, width, height);
 
     _4klang_render(AUDIO_BUFFER);
 
@@ -298,6 +296,7 @@ int main()
     Particles particles(tsize, positions.getTexture(), colors.getTexture());
     Stepper stepper;
     Accelerator accelerator(positions.getTexture());
+    Quad quad;
 
     ShowWindow(window, 1);
     UpdateWindow(window);
@@ -326,6 +325,9 @@ int main()
         const auto dt = t - last_t;
         last_t = t;
 
+        if (t > 60)
+            break;
+
         {
 
             identity(particles.m_modelview);
@@ -341,6 +343,7 @@ int main()
 
             particles.setTime(t);
             particles.render();
+            //quad.render();
         }
 
         SwapBuffers(gldc);
@@ -372,18 +375,32 @@ int main()
         vec3 color1 = { 0.04, 0.03, 0.005 };
         vec3 color2 = { 0.04, 0.035, 0.04 };
 
-        for (int i = 0; i < 2000 * dt; i++) {
-            float rnd = fmod(t * 1000, 1) * 5;
-            float rnd2 = fmod(t * 997, 1) * 5;
-            float rnd3 = fmod(t * 993, 1) * 5;
+        static float pos_data[MAXPARTICLES];
+        static float color_data[MAXPARTICLES];
+        static float vel_data[MAXPARTICLES];
+
+        positions.getData(pos_data);
+        colors.getData(color_data);
+        velocities.getData(vel_data);
+
+        for (int i = 0; i < 2000 * dt && i < 300; i++) {
+            float rnd = fmod(t * 1000 + i * 0.123, 1) * 5 - 2.5;
+            float rnd2 = fmod(t * 997 + i * rnd, 1) * 5 - 2.5;
+            float rnd3 = fmod(t * 993 + i * rnd2, 1) * 5 - 2.5;
             vec3 newpos = { pos.x + rnd, pos.y + rnd2, pos.z + rnd3 };
             vec3 newvelocity = { velocity.x + rnd2, velocity.y + rnd3, velocity.z + rnd };
             vec3* color = i % 2 ? &color1 : &color2;
-            addParticle(positions, colors, velocities, tsize, newpos, newvelocity, *color, t + rnd);
+
+            addParticle(pos_data, color_data, vel_data, tsize, newpos, newvelocity, *color, t + (4*rnd));
         }
+
+        positions.setData(pos_data);
+        colors.setData(color_data);
+        velocities.setData(vel_data);
     }
 
-    DestroyWindow(window);
+
+//    DestroyWindow(window);
     return 0;
 }
 

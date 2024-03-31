@@ -25,6 +25,10 @@ public:
     void bind();
     GLuint getTexture() const { return m_tex; }
     GLuint getDepthTexture() const { return m_depthTex; }
+    unsigned getWidth() const { return m_width; }
+    unsigned getHeight() const { return m_height; }
+    GLuint getData(float *pixels);
+    GLuint setData(float* pixels);
 
 private:
     unsigned m_width;

@@ -35,7 +35,7 @@ public:
 		static const struct {
 			vec2 pos;
 			vec2 texcoor;
-		} vertices[] = { { {-1, -1}, { 0, 0 } }, { { 1, -1 }, { 1, 0 } }, { {1, 1}, { 1, 1 } }, { {-1, 1}, { 0, 1 } } };
+		} vertices[] = { { {1, -1}, { 1, 0 } }, { { -1, -1 }, { 0, 0 } }, { {1, 1}, { 1, 1 } }, { {-1, 1}, { 0, 1 } } };
 
 		GLuint vertex_buffer = Geometry::create_vertex_buffer((void*)vertices, sizeof(vertices));
 

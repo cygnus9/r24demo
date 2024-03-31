@@ -48,3 +48,15 @@ FBOGuard::~FBOGuard() {
 void FBO::bind() {
     glBindTexture(GL_TEXTURE_2D, m_tex);
 }
+
+GLuint FBO::getData(float* pixels) {
+    glBindTexture(GL_TEXTURE_2D, m_tex);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, pixels);
+    return glGetError();
+}
+
+GLuint FBO::setData(float* pixels) {
+    glBindTexture(GL_TEXTURE_2D, m_tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 128, 128, 0, GL_RGBA, GL_FLOAT, pixels);
+    return glGetError();
+}
