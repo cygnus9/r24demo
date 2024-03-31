@@ -113,11 +113,7 @@ void frustum(matrix4f &mtx_out, float left, float right, float bottom, float top
     assert(bottom != top  );
     assert(znear  != zfar );
 
-    for (int x = 0; x < 4; ++x) {
-        for (int y = 0; y < 4; ++y) {
-            mtx_out.set(x, y, 0);
-        }
-    }
+    memset(&mtx_out, 0, sizeof(mtx_out));
 
     mtx_out.set(0, 0, +2.0f * znear / (right - left));
     mtx_out.set(2, 0, (right + left) / (right - left));
