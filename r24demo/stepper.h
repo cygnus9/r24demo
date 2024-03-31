@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "simple.h"
 
 class Stepper : public Simple {
@@ -52,8 +54,8 @@ public:
 		m_tex = tex;
 	}
 
-	void setColor(vec4 color) {
-		m_objcolor = color;
+	void setColor(vec4 && color) {
+		m_objcolor = std::move(color);
 	}
 
 	void uniforms(GLuint program) {

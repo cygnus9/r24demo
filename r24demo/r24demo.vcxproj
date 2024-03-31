@@ -130,7 +130,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions>/CRINKLER %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/CRINKLER /REPORT:$(OutDir)\report.html %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;winmm.lib;$(Configuration)\4klang.obj</AdditionalDependencies>
     </Link>
     <CustomBuildStep>

@@ -247,21 +247,14 @@ create_window(HINSTANCE inst)
 float AUDIO_BUFFER[MAX_SAMPLES * 2];
 
 int nextParticle = 0;
-void addParticle(float *positions, float *colors, float *velocities, int tsize, vec3 pos, vec3 velocity, vec3 color, float t) {
-    float pixel[4] = { pos.x, pos.y, pos.z, 0};
-    positions[nextParticle * 4 + 0] = pos.x;
-    positions[nextParticle * 4 + 1] = pos.y;
-    positions[nextParticle * 4 + 2] = pos.z;
+void addParticle(float *positions, float *colors, float *velocities, int tsize, const vec3 &pos, const vec3 &velocity, const vec3 &color, float t) {
+    memcpy(positions + nextParticle * 4, &pos, sizeof(float) * 3);
     positions[nextParticle * 4 + 3] = 0;
 
-    colors[nextParticle * 4 + 0] = color.x;
-    colors[nextParticle * 4 + 1] = color.y;
-    colors[nextParticle * 4 + 2] = color.z;
+    memcpy(colors + nextParticle * 4, &color, sizeof(float) * 3);
     colors[nextParticle * 4 + 3] = t;
 
-    velocities[nextParticle * 4 + 0] = velocity.x;
-    velocities[nextParticle * 4 + 1] = velocity.y;
-    velocities[nextParticle * 4 + 2] = velocity.z;
+    memcpy(velocities + nextParticle * 4, &velocity, sizeof(float) * 3);
     velocities[nextParticle * 4 + 3] = 0;
 
     nextParticle = (nextParticle + 1) % (tsize * tsize);
